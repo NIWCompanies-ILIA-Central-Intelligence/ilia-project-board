@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIW ↔ ILIA Project Board</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep: #004372;
+    --blue-mid: #0076BD;
+    --blue-light: #66A4D9;
+    --blue-pale: #EBF4FB;
+    --green: #30934C;
+    --green-pale: #E6F5EA;
+    --white: #FFFFFF;
+    --off-white: #F5F7FA;
+    --ink: #0D1F2D;
+    --muted: #6B7E8F;
+    --border: #D4DFE9;
+    --amber: #F4A623;
+    --amber-pale: #FEF4E3;
+    --red: #DC2626;
+    --red-pale: #FEF2F2;
+    --purple: #7C3AED;
+    --purple-pale: #F3EFFE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: var(--ink); }
+  a { text-decoration: none; color: inherit; }
+
+  /* HEADER */
+  header {
+    background: var(--blue-deep); padding: 40px 40px 32px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,118,189,0.3) 0%, transparent 65%);
+    top: -200px; right: -100px; border-radius: 50%;
+  }
+  .header-inner { max-width: 1160px; margin: 0 auto; position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  .header-left .badge { display: inline-block; background: rgba(102,164,217,0.2); color: var(--blue-light); font-family: 'DM Mono',monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 12px; border-radius: 4px; border: 1px solid rgba(102,164,217,0.35); margin-bottom: 14px; }
+  .header-left h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px,4vw,44px); color: white; line-height: 1.1; margin-bottom: 8px; }
+  .header-left h1 em { color: var(--blue-light); font-style: italic; }
+  .header-left p { color: rgba(255,255,255,0.55); font-size: 14px; font-weight: 300; }
+  .header-right { display: flex; gap: 10px; flex-wrap: wrap; }
+  .hdr-stat { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 10px 16px; text-align: center; }
+  .hdr-stat-num { font-family: 'DM Mono',monospace; font-size: 22px; font-weight: 500; color: white; }
+  .hdr-stat-label { font-size: 10.5px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+  /* MAIN */
+  main { max-width: 1160px; margin: 0 auto; padding: 36px 24px 80px; }
+
+  /* SECTION LABEL */
+  .section-label { font-family: 'DM Mono',monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* PROJECT CARDS */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 48px; }
+
+  .project-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .project-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+
+  .card-top { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+  .card-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .card-emoji { font-size: 28px; }
+  .card-status-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .status-progress { background: var(--blue-pale); color: var(--blue-mid); }
+  .status-blocked { background: var(--red-pale); color: var(--red); }
+  .status-review { background: var(--purple-pale); color: var(--purple); }
+  .status-complete { background: var(--green-pale); color: var(--green); }
+  .status-planned { background: var(--off-white); color: var(--muted); border: 1px solid var(--border); }
+
+  .card-title { font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
+  .card-subtitle { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .card-meta { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .meta-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .meta-label { color: var(--muted); font-weight: 500; min-width: 64px; }
+  .meta-value { color: var(--ink); flex: 1; }
+  .meta-value a { color: var(--blue-mid); font-weight: 500; }
+  .meta-value a:hover { text-decoration: underline; }
+
+  .blocker-wrap { background: var(--red-pale); border: 1px solid #FECACA; border-radius: 6px; padding: 8px 12px; }
+  .blocker-label { font-size: 10.5px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .blocker-text { font-size: 11.5px; color: #7F1D1D; line-height: 1.45; }
+
+  .card-links { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+  .card-link-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600;
+    border: 1px solid var(--border); background: var(--off-white); color: var(--ink);
+    transition: all 0.15s; cursor: pointer;
+  }
+  .card-link-btn:hover { background: var(--blue-pale); border-color: var(--blue-light); color: var(--blue-mid); }
+  .card-link-btn.primary { background: var(--blue-mid); color: white; border-color: var(--blue-mid); }
+  .card-link-btn.primary:hover { opacity: 0.85; }
+
+  /* PHASE PROGRESS */
+  .phase-bar { padding: 12px 20px; border-top: 1px solid var(--border); }
+  .phase-label { font-size: 10.5px; color: var(--muted); font-weight: 500; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .phases { display: flex; gap: 4px; }
+  .phase { flex: 1; height: 4px; border-radius: 2px; background: var(--border); }
+  .phase.done { background: var(--green); }
+  .phase.active { background: var(--blue-mid); }
+  .phase.blocked { background: var(--red); }
+
+  /* ADD PROJECT CTA */
+  .add-project-card {
+    background: var(--white); border: 2px dashed var(--border); border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 20px; cursor: pointer; transition: all 0.15s; min-height: 200px;
+  }
+  .add-project-card:hover { border-color: var(--blue-mid); background: var(--blue-pale); }
+  .add-icon { font-size: 28px; margin-bottom: 10px; color: var(--border); }
+  .add-project-card:hover .add-icon { color: var(--blue-mid); }
+  .add-title { font-weight: 600; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .add-project-card:hover .add-title { color: var(--blue-mid); }
+  .add-desc { font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+  /* HOW IT WORKS */
+  .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 48px; }
+  .how-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .how-num { font-family: 'DM Mono',monospace; font-size: 20px; color: var(--border); margin-bottom: 8px; }
+  .how-title { font-weight: 700; font-size: 12.5px; color: var(--ink); margin-bottom: 5px; }
+  .how-desc { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+  /* BACK LINK */
+  .back-bar { max-width: 1160px; margin: 0 auto; padding: 16px 24px 0; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .back-link:hover { color: var(--blue-mid); }
+
+  footer { text-align: center; padding: 24px; font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 24px; }
+  footer a { color: var(--blue-mid); }
+</style>
+</head>
+<body>
+
+<div class="back-bar">
+  <a href="https://niwcompanies-ilia-central-intelligence.github.io/ilia-hub-team/" class="back-link">← Back to ILIA Central Intelligence Hub</a>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="badge">NIW Companies · Simplicity Group</div>
+      <h1>NIW ↔ ILIA <em>Project Board</em></h1>
+      <p>All active ILIA platform projects — status, blockers, owners, and links in one place</p>
+    </div>
+    <div class="header-right">
+      <div class="hdr-stat">
+        <div class="hdr-stat-num">3</div>
+        <div class="hdr-stat-label">Active Projects</div>
+      </div>
+      <div class="hdr-stat">
+        <div class="hdr-stat-num" style="color:#F87171;">2</div>
+        <div class="hdr-stat-label">Blockers</div>
+      </div>
+      <div class="hdr-stat">
+        <div class="hdr-stat-num" style="color:var(--green);">1</div>
+        <div class="hdr-stat-label">In Review</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="section-label" style="margin-top:4px;">Active Projects</div>
+  <div class="projects-grid">
+
+    <!-- PROJECT 1: DBR MVP -->
+    <div class="project-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-emoji">📋</div>
+          <span class="card-status-badge status-blocked">🚨 Blocked</span>
+        </div>
+        <div class="card-title">DBR MVP — Death Benefit Reduction Automation</div>
+        <div class="card-subtitle">Automates the full DBR workflow in ILIA — from automated event identification through carrier submission and DocuSign confirmation</div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row">
+          <span class="meta-label">Owner</span>
+          <span class="meta-value">Jamin Austin</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">eSign</span>
+          <span class="meta-value">DocuSign (Chris Lane — SME)</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">JIRA</span>
+          <span class="meta-value"><a href="https://simplicitygh.atlassian.net/browse/NIWD-1735" target="_blank">NIWD-1735 →</a></span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Confluence</span>
+          <span class="meta-value"><a href="https://simplicitygh.atlassian.net" target="_blank">DBR MVP Spec →</a></span>
+        </div>
+        <div class="blocker-wrap">
+          <div class="blocker-label">🚨 2 Blockers</div>
+          <div class="blocker-text">B1 — Data Readiness: deathBenefitReduction field blank/zero for majority of Year 10–15 policies (27,649 rows in DOMO)<br><br>B2 — DocuSign implementation not started — awaiting Chris Lane</div>
+        </div>
+      </div>
+      <div class="phase-bar">
+        <div class="phase-label"><span>Phases</span><span>Phase 1 of 4</span></div>
+        <div class="phases">
+          <div class="phase blocked"></div>
+          <div class="phase"></div>
+          <div class="phase"></div>
+          <div class="phase"></div>
+        </div>
+      </div>
+      <div class="card-links">
+        <a href="https://niwcompanies-ilia-central-intelligence.github.io/ilia-dbr-workflow/" target="_blank" class="card-link-btn primary">→ DBR Workflow</a>
+        <a href="https://niwcompanies-ilia-central-intelligence.github.io/ilia-dbr/" target="_blank" class="card-link-btn">DBR Overview</a>
+        <a href="https://niwcompanies-ilia-central-intelligence.github.io/ilia-dbr-tranche-management/" target="_blank" class="card-link-btn">Tranche Mgmt</a>
+      </div>
+    </div>
+
+    <!-- PROJECT 2: MASTER SETTLOR PORTAL -->
+    <div class="project-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-emoji">🏛️</div>
+          <span class="card-status-badge status-progress">⚡ In Progress</span>
+        </div>
+        <div class="card-title">Master Settlor Portal</div>
+        <div class="card-subtitle">Dedicated portal for Master Settlors to view associated policies, trusts, servicing, and action items across their Kai-Zen portfolio</div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row">
+          <span class="meta-label">Owner</span>
+          <span class="meta-value">Jamin Austin</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Screens</span>
+          <span class="meta-value">6 built — Dashboard, Policies, Trusts, Servicing, Action Items, View Policies</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Related</span>
+          <span class="meta-value">DBR MVP (trustee/settlor touchpoints overlap)</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Confluence</span>
+          <span class="meta-value"><a href="https://simplicitygh.atlassian.net" target="_blank">Master Settlor Spec →</a></span>
+        </div>
+      </div>
+      <div class="phase-bar">
+        <div class="phase-label"><span>Phases</span><span>Phase 2 of 4</span></div>
+        <div class="phases">
+          <div class="phase done"></div>
+          <div class="phase active"></div>
+          <div class="phase"></div>
+          <div class="phase"></div>
+        </div>
+      </div>
+      <div class="card-links">
+        <a href="https://niwcompanies-ilia-central-intelligence.github.io/ilia-master-settlor/" target="_blank" class="card-link-btn primary">→ Live Prototype</a>
+        <a href="https://github.com/NIWCompanies-ILIA-Central-Intelligence/ilia-master-settlor" target="_blank" class="card-link-btn">GitHub →</a>
+      </div>
+    </div>
+
+    <!-- PROJECT 3: AGENT GUIDE -->
+    <div class="project-card">
+      <div class="card-top">
+        <div class="card-top-row">
+          <div class="card-emoji">📖</div>
+          <span class="card-status-badge status-review">👁 In Review</span>
+        </div>
+        <div class="card-title">Agent Guide — Interactive Web Experience</div>
+        <div class="card-subtitle">60-slide PPTX converted into a fully interactive single-page HTML experience covering all 10 sections of agent onboarding and platform usage</div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row">
+          <span class="meta-label">Owner</span>
+          <span class="meta-value">Jamin Austin</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Sections</span>
+          <span class="meta-value">10 — Agent Registration through Important Notes</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Features</span>
+          <span class="meta-value">Sticky nav, scroll spy, progress bar, enrollment tracker, mobile responsive</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Drive</span>
+          <span class="meta-value"><a href="https://drive.google.com/drive/folders/19AZelQigyny2F3U15DCiemftcGbxTdgc" target="_blank">Project Folder →</a></span>
+        </div>
+      </div>
+      <div class="phase-bar">
+        <div class="phase-label"><span>Phases</span><span>Phase 3 of 4 — Review</span></div>
+        <div class="phases">
+          <div class="phase done"></div>
+          <div class="phase done"></div>
+          <div class="phase active"></div>
+          <div class="phase"></div>
+        </div>
+      </div>
+      <div class="card-links">
+        <a href="https://niwcompanies-ilia-central-intelligence.github.io/ilia-agent-guide/" target="_blank" class="card-link-btn primary">→ Live Guide</a>
+        <a href="https://github.com/NIWCompanies-ILIA-Central-Intelligence/ilia-agent-guide" target="_blank" class="card-link-btn">GitHub →</a>
+      </div>
+    </div>
+
+    <!-- ADD NEW PROJECT -->
+    <div class="add-project-card" onclick="alert('Start a new P- project in Claude — it will automatically appear here')">
+      <div class="add-icon">+</div>
+      <div class="add-title">Start a New Project</div>
+      <div class="add-desc">Begin a new P- project in Claude.<br>It will appear here automatically with status, blockers, and links.</div>
+    </div>
+
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section-label">How Projects Get Here</div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Start a P- project in Claude</div>
+      <div class="how-desc">Name your chat "P- [Project Name]" in Claude. Claude generates a project overview, breaks it into epics and stories, and creates JIRA tickets.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">GitHub overview page created</div>
+      <div class="how-desc">Claude builds a clickable GitHub Pages overview for the project — design specs, workflow diagrams, prototype links, and acceptance criteria.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">Project tile appears here</div>
+      <div class="how-desc">The project card is added to this board with status, owner, blockers, phase progress, and links to GitHub, JIRA, and Confluence.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">04</div>
+      <div class="how-title">Board stays live</div>
+      <div class="how-desc">As work progresses, Claude updates status, marks blockers, advances phases, and keeps this board current — no manual updates needed.</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  NIW ↔ ILIA Project Board · NIW Companies / Simplicity Group ·
+  <a href="https://niwcompanies-ilia-central-intelligence.github.io/ilia-hub-team/" target="_blank">CIH Hub</a> ·
+  <a href="https://simplicitygh.atlassian.net/jira" target="_blank">JIRA</a> ·
+  <a href="https://simplicitygh.atlassian.net" target="_blank">Confluence</a>
+</footer>
+
+</body>
+</html>
